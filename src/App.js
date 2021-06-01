@@ -101,8 +101,8 @@ function ChatRoom(props) {
   console.log(props.openSqId)
   const dummy = useRef()
   const messageRef = firestore.collection('messages') // reference a firestore collection
-  const query = messageRef.where('openSqId', '==', props.openSqId).orderBy('createdAt').limit(25)
-
+  const query = messageRef.where('openSqId', '==', props.openSqId).limit(25)
+  // .orderBy('createdAt')
   const [messages] = useCollectionData(query, { idField: 'id' }) // listen to data with hook
 
   const [formValue, setFormValue] = useState('')
