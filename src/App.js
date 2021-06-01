@@ -32,7 +32,7 @@ function App() {
   // but its error. since using firebase, it should be pay-as-you-go to be deployed
   // now just npm start
   const [user] = useAuthState(auth) // signed in user is and object, null otherwise (signed out)
-
+  // var [openSquareId] = ""
   return (
     <div className="App">
       <header>
@@ -42,13 +42,32 @@ function App() {
 
       <section>
         {/* if user signed in, show ChatRoom. SignIn otherwise  */}
-        {user ? <ChatRoom /> : <SignIn />}
+        {user ? <OpenSquareList /> : <SignIn />}
+
+        {/* {user ? (openSquareId === "" ? <OpenSquareList /> : <ChatRoom osId={"dummyosId"} />) : <SignIn />} */}
 
       </section>
     </div>
   );
-}
 
+
+}
+function OpenSquareList() {
+  const openSqRef = firestore.collection('opensquare') // reference a firestore collection
+  const query = openSqRef.orderBy('createdAt')
+
+  const [openSq] = useCollectionData(query, { idField: 'id' }) // listen to data with hook
+
+  return (
+    <>
+      <center>
+        <p>Open Square</p>
+        {openSq && openSq.map(oS => <p key={oS.id}><button>{oS.name} </button></p>)}
+      </center>
+    </>
+
+  )
+}
 function SignIn() {
   const signInWithGoogle = () => {
     const provider = new firebase.auth.GoogleAuthProvider();
@@ -59,13 +78,17 @@ function SignIn() {
   )
 }
 
+
+
 function SignOut() {
   return auth.currentUser && (
     <button onClick={() => auth.signOut()}>Sign Out</button>
   )
 }
 
-function ChatRoom() {
+function ChatRoom(props) {
+  const osId = props.osId
+  console.log(osId)
   const dummy = useRef()
   const messageRef = firestore.collection('messages') // reference a firestore collection
   const query = messageRef.orderBy('createdAt').limit(25)
@@ -112,7 +135,7 @@ function ChatMessage(props) {
   return (
     <>
       <div className={`message ${messageClass}`}>
-        <img src={photoURL}></img>
+        <img src={photoURL} alt={photoURL}></img>
         <p>{text}</p>
       </div>
     </>
