@@ -38,7 +38,7 @@ function App() {
     <div className="App">
       <header>
         <h1>⚛️🔥💬</h1>
-        <SignOut setOpenSqId={setOpenSqId} />
+        {openSqId === "" ? <SignOut setOpenSqId={setOpenSqId} /> : <LeaveSquare setOpenSqId={setOpenSqId} />}
       </header>
 
       <section>
@@ -93,6 +93,15 @@ function SignOut(props) {
       auth.signOut()
     }
     }>Sign Out</button>
+  )
+}
+
+function LeaveSquare(props) {
+  return (
+    <button onClick={function () {
+      props.setOpenSqId('')
+    }
+    }>Leave Square</button>
   )
 }
 
