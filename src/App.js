@@ -98,11 +98,10 @@ function LeaveSquare(props) {
 }
 
 function ChatRoom(props) {
-  const openSqId = props.openSqId
-  console.log(openSqId)
+  console.log(props.openSqId)
   const dummy = useRef()
   const messageRef = firestore.collection('messages') // reference a firestore collection
-  const query = messageRef.orderBy('createdAt').limit(25)
+  const query = messageRef.where('openSqId', '==', props.openSqId).orderBy('createdAt').limit(25)
 
   const [messages] = useCollectionData(query, { idField: 'id' }) // listen to data with hook
 
@@ -117,7 +116,8 @@ function ChatRoom(props) {
       text: formValue,
       createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       uid,
-      photoURL
+      photoURL,
+      openSqId: props.openSqId
     })
 
     setFormValue('')
@@ -140,7 +140,7 @@ function ChatRoom(props) {
 }
 
 function ChatMessage(props) {
-  const { text, uid, photoURL } = props.message
+  const { text, uid, photoURL, openSqId } = props.message
 
   const messageClass = uid === auth.currentUser.uid ? 'sent' : 'received'
   return (
