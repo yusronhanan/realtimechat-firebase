@@ -12,13 +12,13 @@ import { useCollectionData } from 'react-firebase-hooks/firestore'
 
 var firebaseConfig = {
   //FirebaseConfig is not for public
-  apiKey: "",
-  authDomain: "",
-  projectId: "",
-  storageBucket: "",
-  messagingSenderId: "",
-  appId: "",
-  measurementId: ""
+  apiKey: "AIzaSyDG-mdSo-Bur-HmVa5tX1wgcowE8qsQ02U",
+  authDomain: "realtimechat-firebase-react.firebaseapp.com",
+  projectId: "realtimechat-firebase-react",
+  storageBucket: "realtimechat-firebase-react.appspot.com",
+  messagingSenderId: "959077768405",
+  appId: "1:959077768405:web:b6f9aa91cbad443bf7165c",
+  measurementId: "G-XRNBNZQTBE"
 };
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
@@ -36,13 +36,13 @@ function App() {
   return (
     <div className="App">
       <header>
-      <h1>⚛️🔥💬</h1>
-      <SignOut />
+        <h1>⚛️🔥💬</h1>
+        <SignOut />
       </header>
 
       <section>
         {/* if user signed in, show ChatRoom. SignIn otherwise  */}
-        {user ? <ChatRoom /> : <SignIn />} 
+        {user ? <ChatRoom /> : <SignIn />}
 
       </section>
     </div>
@@ -53,7 +53,7 @@ function SignIn() {
   const signInWithGoogle = () => {
     const provider = new firebase.auth.GoogleAuthProvider();
     auth.signInWithPopup(provider); // pop up sign in w/ google
-} 
+  }
   return (
     <button onClick={signInWithGoogle}>Sign in with Google</button>
   )
@@ -70,34 +70,34 @@ function ChatRoom() {
   const messageRef = firestore.collection('messages') // reference a firestore collection
   const query = messageRef.orderBy('createdAt').limit(25)
 
-  const [messages] = useCollectionData(query, {idField: 'id'}) // listen to data with hook
+  const [messages] = useCollectionData(query, { idField: 'id' }) // listen to data with hook
 
   const [formValue, setFormValue] = useState('')
 
-  const sendMessage = async(e) => {
+  const sendMessage = async (e) => {
     e.preventDefault()
-  const { uid, photoURL } = auth.currentUser
-  
-  //create new document in firestore, in this case is 'sendMessage'
-  await messageRef.add({ 
-    text: formValue,
-    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-    uid,
-    photoURL
-  })
+    const { uid, photoURL } = auth.currentUser
 
-  setFormValue('')
-  dummy.current.scrollIntoView({behavior: 'smooth'})
+    //create new document in firestore, in this case is 'sendMessage'
+    await messageRef.add({
+      text: formValue,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      uid,
+      photoURL
+    })
+
+    setFormValue('')
+    dummy.current.scrollIntoView({ behavior: 'smooth' })
   }
-  return(
+  return (
     <>
-    <main>
-      {messages && messages.map(msg => <ChatMessage key={msg.id} message={msg} />)}
-      
-    <div ref={dummy}></div>
-    </main>
+      <main>
+        {messages && messages.map(msg => <ChatMessage key={msg.id} message={msg} />)}
+
+        <div ref={dummy}></div>
+      </main>
       <form onSubmit={sendMessage}>
-        <input value={formValue} onChange={(e) => setFormValue(e.target.value)}/>
+        <input value={formValue} onChange={(e) => setFormValue(e.target.value)} />
 
         <button type="submit">🕊</button>
       </form>
@@ -109,14 +109,14 @@ function ChatMessage(props) {
   const { text, uid, photoURL } = props.message
 
   const messageClass = uid === auth.currentUser.uid ? 'sent' : 'received'
-  return(
-  <>
-    <div className={`message ${messageClass}`}>
-      <img src={photoURL}></img>
-      <p>{text}</p>
-    </div>
-  </>
-  ) 
+  return (
+    <>
+      <div className={`message ${messageClass}`}>
+        <img src={photoURL}></img>
+        <p>{text}</p>
+      </div>
+    </>
+  )
 }
 
 export default App;
