@@ -102,9 +102,8 @@ function ChatRoom(props) {
   const dummy = useRef()
   const messageRef = firestore.collection('messages') // reference a firestore collection
   const query = messageRef.where('openSqId', '==', props.openSqId).limit(25)
-  // .orderBy('createdAt')
+  // .orderBy('createdAt', 'asc').orderBy('openSqId', 'asc')
   const [messages] = useCollectionData(query, { idField: 'id' }) // listen to data with hook
-
   const [formValue, setFormValue] = useState('')
 
   const sendMessage = async (e) => {
@@ -126,7 +125,9 @@ function ChatRoom(props) {
   return (
     <>
       <main>
-        {messages && messages.map(msg => <ChatMessage key={msg.id} message={msg} />)}
+        {messages && messages.sort(function (a, b) {
+          return a.createdAt - b.createdAt;
+        }).map(msg => <ChatMessage key={msg.id} message={msg} />)}
 
         <div ref={dummy}></div>
       </main>
