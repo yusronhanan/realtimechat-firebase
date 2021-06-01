@@ -42,11 +42,8 @@ function App() {
       </header>
 
       <section>
-        {/* if user signed in, show ChatRoom. SignIn otherwise  */}
-        {user ? <OpenSquareList openSqId={openSqId} setOpenSqId={setOpenSqId} /> : <SignIn />}
-
-        {/* {user ? (openSquareId === "" ? <OpenSquareList /> : <ChatRoom osId={"dummyosId"} />) : <SignIn />} */}
-
+        {/* if user signed in, show Open Square, SignIn otherwise. then if Open Square selected, show ChatRoom  */}
+        {user ? openSqId === "" ? <OpenSquareList openSqId={openSqId} setOpenSqId={setOpenSqId} /> : <ChatRoom openSqId={openSqId} /> : <SignIn />}
       </section>
     </div>
   );
@@ -59,20 +56,15 @@ function OpenSquareList(props) {
 
   const [openSq] = useCollectionData(query, { idField: 'id' }) // listen to data with hook
 
-  console.warn(props)
-  if (props.openSqId === "") {
-    return (
-      <>
-        <center>
-          <p>Open Square</p>
-          {openSq && openSq.map(oS => <p key={oS.id}><button onClick={() => props.setOpenSqId(oS.id)}>{oS.name}</button></p>)}
-        </center>
-      </>
+  return (
+    <>
+      <center>
+        <p>Open Square</p>
+        {openSq && openSq.map(oS => <p key={oS.id}><button onClick={() => props.setOpenSqId(oS.id)}>{oS.name}</button></p>)}
+      </center>
+    </>
 
-    )
-  } else {
-    return (<ChatRoom osId={props.openSqId} />)
-  }
+  )
 }
 function SignIn() {
   const signInWithGoogle = () => {
@@ -106,8 +98,8 @@ function LeaveSquare(props) {
 }
 
 function ChatRoom(props) {
-  const osId = props.osId
-  console.log(osId)
+  const openSqId = props.openSqId
+  console.log(openSqId)
   const dummy = useRef()
   const messageRef = firestore.collection('messages') // reference a firestore collection
   const query = messageRef.orderBy('createdAt').limit(25)
