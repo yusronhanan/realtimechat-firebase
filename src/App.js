@@ -32,7 +32,6 @@ function App() {
   // but its error. since using firebase, it should be pay-as-you-go to be deployed
   // now just npm start
   const [user] = useAuthState(auth) // signed in user is and object, null otherwise (signed out)
-  // var [openSquareId] = ""
   return (
     <div className="App">
       <header>
@@ -58,15 +57,21 @@ function OpenSquareList() {
 
   const [openSq] = useCollectionData(query, { idField: 'id' }) // listen to data with hook
 
-  return (
-    <>
-      <center>
-        <p>Open Square</p>
-        {openSq && openSq.map(oS => <p key={oS.id}><button>{oS.name} </button></p>)}
-      </center>
-    </>
+  const [openSqId, setOpenSqId] = useState('')
 
-  )
+  if (openSqId) {
+    return (
+      <>
+        <center>
+          <p>Open Square</p>
+          {openSq && openSq.map(oS => <p key={oS.id}><button onClick={() => setOpenSqId(oS.id)}>{oS.name}</button></p>)}
+        </center>
+      </>
+
+    )
+  } else {
+    return (<ChatRoom osId={openSqId} />)
+  }
 }
 function SignIn() {
   const signInWithGoogle = () => {
