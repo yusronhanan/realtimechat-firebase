@@ -32,16 +32,18 @@ function App() {
   // but its error. since using firebase, it should be pay-as-you-go to be deployed
   // now just npm start
   const [user] = useAuthState(auth) // signed in user is and object, null otherwise (signed out)
+  const [openSqId, setOpenSqId] = useState('')
+
   return (
     <div className="App">
       <header>
         <h1>⚛️🔥💬</h1>
-        <SignOut />
+        <SignOut setOpenSqId={setOpenSqId} />
       </header>
 
       <section>
         {/* if user signed in, show ChatRoom. SignIn otherwise  */}
-        {user ? <OpenSquareList /> : <SignIn />}
+        {user ? <OpenSquareList openSqId={openSqId} setOpenSqId={setOpenSqId} /> : <SignIn />}
 
         {/* {user ? (openSquareId === "" ? <OpenSquareList /> : <ChatRoom osId={"dummyosId"} />) : <SignIn />} */}
 
@@ -51,26 +53,25 @@ function App() {
 
 
 }
-function OpenSquareList() {
+function OpenSquareList(props) {
   const openSqRef = firestore.collection('opensquare') // reference a firestore collection
   const query = openSqRef.orderBy('createdAt')
 
   const [openSq] = useCollectionData(query, { idField: 'id' }) // listen to data with hook
 
-  const [openSqId, setOpenSqId] = useState('')
-
-  if (openSqId) {
+  console.warn(props)
+  if (props.openSqId === "") {
     return (
       <>
         <center>
           <p>Open Square</p>
-          {openSq && openSq.map(oS => <p key={oS.id}><button onClick={() => setOpenSqId(oS.id)}>{oS.name}</button></p>)}
+          {openSq && openSq.map(oS => <p key={oS.id}><button onClick={() => props.setOpenSqId(oS.id)}>{oS.name}</button></p>)}
         </center>
       </>
 
     )
   } else {
-    return (<ChatRoom osId={openSqId} />)
+    return (<ChatRoom osId={props.openSqId} />)
   }
 }
 function SignIn() {
@@ -85,9 +86,13 @@ function SignIn() {
 
 
 
-function SignOut() {
+function SignOut(props) {
   return auth.currentUser && (
-    <button onClick={() => auth.signOut()}>Sign Out</button>
+    <button onClick={function () {
+      props.setOpenSqId('')
+      auth.signOut()
+    }
+    }>Sign Out</button>
   )
 }
 
