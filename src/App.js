@@ -33,17 +33,18 @@ function App() {
   // now just npm start
   const [user] = useAuthState(auth) // signed in user is and object, null otherwise (signed out)
   const [openSqId, setOpenSqId] = useState('')
+  const [openSqName, setOpenSqName] = useState('')
 
   return (
     <div className="App">
       <header>
-        <h1>⚛️🔥💬</h1>
+        <h1>{openSqId === "" ? 'Open Square 💬' : openSqName}</h1>
         {openSqId === "" ? <SignOut setOpenSqId={setOpenSqId} /> : <LeaveSquare setOpenSqId={setOpenSqId} />}
       </header>
 
       <section>
         {/* if user signed in, show Open Square, SignIn otherwise. then if Open Square selected, show ChatRoom  */}
-        {user ? openSqId === "" ? <OpenSquareList openSqId={openSqId} setOpenSqId={setOpenSqId} /> : <ChatRoom openSqId={openSqId} /> : <SignIn />}
+        {user ? (openSqId === "" ? <OpenSquareList openSqId={openSqId} setOpenSqId={setOpenSqId} setOpenSqName={setOpenSqName} /> : <ChatRoom openSqId={openSqId} />) : <SignIn />}
       </section>
     </div>
   );
@@ -55,12 +56,17 @@ function OpenSquareList(props) {
   const query = openSqRef.orderBy('createdAt')
 
   const [openSq] = useCollectionData(query, { idField: 'id' }) // listen to data with hook
-
+  let setOpenSq = function (oS) {
+    props.setOpenSqId(oS.id)
+    props.setOpenSqName(oS.name)
+  }
   return (
     <>
       <center>
         <p>Open Square</p>
-        {openSq && openSq.map(oS => <p key={oS.id}><button onClick={() => props.setOpenSqId(oS.id)}>{oS.name}</button></p>)}
+        {openSq && openSq.map(oS => <p key={oS.id}><button onClick={() =>
+          setOpenSq(oS)
+        }>{oS.name}</button></p>)}
       </center>
     </>
 
