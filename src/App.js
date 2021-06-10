@@ -34,23 +34,24 @@ function App() {
   const [user] = useAuthState(auth) // signed in user is and object, null otherwise (signed out)
   const [openSqId, setOpenSqId] = useState('')
   const [openSqName, setOpenSqName] = useState('')
-
+  const [isCreateOpenSq, setIsCreateOpenSq] = useState('')
   return (
     <div className="App">
       <header>
-        <h1>{openSqId === "" ? 'Open Square 💬' : openSqName}</h1>
-        {openSqId === "" ? <SignOut setOpenSqId={setOpenSqId} /> : <LeaveSquare setOpenSqId={setOpenSqId} />}
+        <h1>{isCreateOpenSq === "" ? (openSqId === "" ? 'Open Square 💬' : openSqName) : 'Create New Open Square 💬'}</h1>
+        {isCreateOpenSq === "" ? (openSqId === "" ? <SignOut setOpenSqId={setOpenSqId} /> : <LeaveSquare setOpenSqId={setOpenSqId} />) : <BackToOpenSquare setIsCreateOpenSq={setIsCreateOpenSq} />}
       </header>
 
       <section>
         {/* if user signed in, show Open Square, SignIn otherwise. then if Open Square selected, show ChatRoom  */}
-        {user ? (openSqId === "" ? <OpenSquareList openSqId={openSqId} setOpenSqId={setOpenSqId} setOpenSqName={setOpenSqName} /> : <ChatRoom openSqId={openSqId} />) : <SignIn />}
+        {user ? (isCreateOpenSq === "" ? (openSqId === "" ? <OpenSquareList openSqId={openSqId} setOpenSqId={setOpenSqId} setOpenSqName={setOpenSqName} setIsCreateOpenSq={setIsCreateOpenSq} /> : <ChatRoom openSqId={openSqId} />) : <CreateOpenSquare setIsCreateOpenSq={setIsCreateOpenSq} />) : <SignIn />}
       </section>
     </div>
   );
 
 
 }
+
 function OpenSquareList(props) {
   const openSqRef = firestore.collection('opensquare') // reference a firestore collection
   const query = openSqRef.orderBy('createdAt')
@@ -60,14 +61,21 @@ function OpenSquareList(props) {
     props.setOpenSqId(oS.id)
     props.setOpenSqName(oS.name)
   }
+  let setIsCreateOpenSq = function () {
+    props.setIsCreateOpenSq("open")
+  }
   return (
     <>
       <center>
-        <p>Open Square</p>
-        {openSq && openSq.map(oS => <p key={oS.id}><button onClick={() =>
-          setOpenSq(oS)
-        }>{oS.name}</button></p>)}
+        <p>Open Square</p>  <button onClick={setIsCreateOpenSq}>+</button>
       </center>
+
+      <div className="btn-group">
+        {openSq && openSq.map(oS => <button key={oS.id} onClick={() =>
+          setOpenSq(oS)
+        }>{oS.name}</button>)}
+      </div>
+
     </>
 
   )
@@ -100,6 +108,14 @@ function LeaveSquare(props) {
       props.setOpenSqId('')
     }
     }>Leave Square</button>
+  )
+}
+function BackToOpenSquare(props) {
+  return (
+    <button onClick={function () {
+      props.setIsCreateOpenSq('')
+    }
+    }>Back</button>
   )
 }
 
@@ -145,7 +161,35 @@ function ChatRoom(props) {
     </>
   )
 }
+function CreateOpenSquare(props) {
+  const openSquareRef = firestore.collection('opensquare') // reference a firestore collection
+  const [formValue, setFormValue] = useState('')
 
+  const createOpenSquare = async (e) => {
+    e.preventDefault()
+    const { uid, photoURL } = auth.currentUser
+
+    //create new document in firestore, in this case is 'createOpenSquare'
+    await openSquareRef.add({
+      name: formValue,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      uid,
+    })
+
+    setFormValue('')
+    props.setIsCreateOpenSq("")
+  }
+
+  return (
+    <>
+      <center>
+        <input placeholder="Open Square name goes here..." className="inputNewOpenSquare" maxLength="20" value={formValue} onChange={(e) => setFormValue(e.target.value)} />
+        <button onClick={createOpenSquare}>
+          Create</button>
+      </center>
+    </>
+  )
+}
 function ChatMessage(props) {
   const { text, uid, photoURL, openSqId } = props.message
 
