@@ -194,11 +194,38 @@ function ChatMessage(props) {
   const { text, uid, photoURL, openSqId } = props.message
 
   const messageClass = uid === auth.currentUser.uid ? 'sent' : 'received'
+  let textReplace = function (t) {
+    let tex = t;
+    if (tex.toLowerCase().includes("star")) {
+      tex = tex.replace('star', '⭐️');
+    }
+    if (tex.toLowerCase().includes("boy")) {
+      tex = tex.replace('boy', '👦🏻');
+    }
+    if (tex.toLowerCase().includes("girl")) {
+      tex = tex.replace('girl', '👧🏻');
+    }
+    if (tex.toLowerCase().includes("computer")) {
+      tex = tex.replace('computer', '👨🏻‍💻');
+    }
+    if (tex.toLowerCase().includes("love")) {
+      tex = tex.replace('love', '❤️');
+    }
+    return tex;
+  }
   return (
     <>
+
       <div className={`message ${messageClass}`}>
         <img src={photoURL} alt={photoURL}></img>
-        <p>{text}</p>
+
+        {/* {text.toLowerCase() == "star" ? <p>⭐️</p> : ""}
+        {text.toLowerCase() == "boy" ? <p>👦🏻</p> : ""}
+        {text.toLowerCase() == "girl" ? <p>👧🏻</p> : ""}
+        {text.toLowerCase() == "computer" ? <p>👨🏻‍💻</p> : ""}
+        {text.toLowerCase() == "love" ? <p>❤️</p> : ""}
+        {text.toLowerCase() != "computer" && text.toLowerCase() != "love" && text.toLowerCase() != "star" && text.toLowerCase() != "boy" && text.toLowerCase() != "girl" ? <p>{text}</p> : ""} */}
+        <p>{textReplace(text)}</p>
       </div>
     </>
   )
